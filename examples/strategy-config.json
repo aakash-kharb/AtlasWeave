@@ -1,0 +1,7 @@
+{
+  "aliases": {"cust_id": "Customer ID"},
+  "weights": {"name": 0.4, "type": 0.1, "overlap": 0.4, "uniqueness": 0.1},
+  "trim": false,
+  "casefold": false,
+  "min_score": 0.55
+}

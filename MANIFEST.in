@@ -1,0 +1,6 @@
+include LICENSE README.md CONTRIBUTING.md CHANGELOG.md requirements-dev.lock
+recursive-include src/atlasweave/schemas *.json
+recursive-include examples *.csv *.json
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include docs *.md

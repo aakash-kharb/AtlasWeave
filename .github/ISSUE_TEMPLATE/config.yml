@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security reporting
+    url: https://github.com/aakash-kharb/AtlasWeave/blob/main/SECURITY.md
+    about: Follow the private reporting process; do not disclose vulnerabilities in public issues.

@@ -1,0 +1,529 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "engine_version": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "left": {
+          "$ref": "#/$defs/export_source"
+        },
+        "right": {
+          "$ref": "#/$defs/export_source"
+        }
+      },
+      "required": [
+        "left",
+        "right"
+      ],
+      "additionalProperties": false
+    },
+    "normalization": {
+      "type": "object",
+      "properties": {
+        "trim": {
+          "type": "boolean"
+        },
+        "casefold": {
+          "type": "boolean"
+        },
+        "preserve_leading_zeros": {
+          "const": true
+        },
+        "nulls_match": {
+          "const": false
+        }
+      },
+      "required": [
+        "trim",
+        "casefold",
+        "preserve_leading_zeros",
+        "nulls_match"
+      ],
+      "additionalProperties": false
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/approved"
+      },
+      "minItems": 1
+    },
+    "unresolved_candidates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "engine_version",
+    "sources",
+    "normalization",
+    "mappings",
+    "unresolved_candidates"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aakash-kharb/AtlasWeave/schemas/mapping-v1",
+  "$defs": {
+    "options": {
+      "type": "object",
+      "properties": {
+        "sheet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "delimiter": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        },
+        "header_row": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        }
+      },
+      "required": [
+        "sheet",
+        "delimiter",
+        "header_row",
+        "max_rows"
+      ],
+      "additionalProperties": false
+    },
+    "field": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^f[1-9][0-9]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "number",
+            "boolean",
+            "text",
+            "mixed",
+            "empty"
+          ]
+        },
+        "row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "null_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distinct_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicate_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "row_count",
+        "null_count",
+        "distinct_count",
+        "duplicate_count"
+      ],
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "object",
+      "properties": {
+        "join": {
+          "enum": [
+            "left",
+            "inner"
+          ]
+        },
+        "require_unique_right": {
+          "type": "boolean"
+        },
+        "require_non_null_right": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "join",
+        "require_unique_right",
+        "require_non_null_right"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "shared_distinct": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmatched_left_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmatched_right_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inner_join_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "left_join_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "left_nulls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "right_nulls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "left_duplicates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "right_duplicates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cardinality": {
+          "enum": [
+            "one-to-one",
+            "one-to-many",
+            "many-to-one",
+            "many-to-many",
+            "no-overlap"
+          ]
+        }
+      },
+      "required": [
+        "shared_distinct",
+        "unmatched_left_rows",
+        "unmatched_right_rows",
+        "inner_join_rows",
+        "left_join_rows",
+        "left_nulls",
+        "right_nulls",
+        "left_duplicates",
+        "right_duplicates",
+        "cardinality"
+      ],
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "weights": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "number",
+              "minimum": 0
+            },
+            "type": {
+              "type": "number",
+              "minimum": 0
+            },
+            "overlap": {
+              "type": "number",
+              "minimum": 0
+            },
+            "uniqueness": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "overlap",
+            "uniqueness"
+          ],
+          "additionalProperties": false
+        },
+        "trim": {
+          "type": "boolean"
+        },
+        "casefold": {
+          "type": "boolean"
+        },
+        "min_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "aliases",
+        "weights",
+        "trim",
+        "casefold",
+        "min_score"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "left_field": {
+          "type": "string"
+        },
+        "right_field": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scores": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "type": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "overlap": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "uniqueness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "overlap",
+            "uniqueness"
+          ],
+          "additionalProperties": false
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "scope": {
+          "enum": [
+            "full",
+            "sample"
+          ]
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "rules": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rules"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "left_field",
+        "right_field",
+        "score",
+        "scores",
+        "evidence",
+        "scope",
+        "status",
+        "rules"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "storage": {
+          "enum": [
+            "file"
+          ]
+        },
+        "format": {
+          "enum": [
+            "csv",
+            "xlsx"
+          ]
+        },
+        "shape": {
+          "enum": [
+            "table"
+          ]
+        },
+        "options": {
+          "$ref": "#/$defs/options"
+        },
+        "row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "path": {
+          "type": "string"
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "sha256",
+        "storage",
+        "format",
+        "shape",
+        "options",
+        "row_count",
+        "warnings",
+        "path",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "export_source": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "storage": {
+          "enum": [
+            "file"
+          ]
+        },
+        "format": {
+          "enum": [
+            "csv",
+            "xlsx"
+          ]
+        },
+        "shape": {
+          "enum": [
+            "table"
+          ]
+        },
+        "options": {
+          "$ref": "#/$defs/options"
+        },
+        "row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "sha256",
+        "storage",
+        "format",
+        "shape",
+        "options",
+        "row_count",
+        "warnings",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "approved": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/candidate"
+        },
+        {
+          "properties": {
+            "status": {
+              "const": "approved"
+            },
+            "scope": {
+              "const": "full"
+            },
+            "rules": {
+              "$ref": "#/$defs/rules"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

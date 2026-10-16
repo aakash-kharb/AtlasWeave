@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atlasweave"
+version = "0.1.0a1"
+description = "Discover how your data connects. Review the evidence. Export an agent-ready mapping."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Aakash Kharb"}]
+dependencies = ["openpyxl>=3.1.5,<4", "defusedxml>=0.7.1,<1", "jsonschema>=4.23,<5"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9", "ruff>=0.11,<1", "build>=1.2,<2"]
+
+[project.scripts]
+atlasweave = "atlasweave.cli:main"
+
+[project.urls]
+Repository = "https://github.com/aakash-kharb/AtlasWeave"
+Issues = "https://github.com/aakash-kharb/AtlasWeave/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+atlasweave = ["schemas/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
