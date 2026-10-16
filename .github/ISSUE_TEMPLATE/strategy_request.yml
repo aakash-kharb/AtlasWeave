@@ -1,0 +1,21 @@
+name: Strategy proposal
+description: Propose an explainable matching strategy.
+body:
+  - type: textarea
+    id: method
+    attributes:
+      label: Detection method, configuration, evidence, and ranking
+    validations:
+      required: true
+  - type: textarea
+    id: cases
+    attributes:
+      label: Positive examples and misleading counterexamples
+    validations:
+      required: true
+  - type: textarea
+    id: performance
+    attributes:
+      label: Required inputs and runtime/memory considerations
+    validations:
+      required: true

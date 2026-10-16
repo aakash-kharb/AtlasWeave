@@ -1,0 +1,22 @@
+name: Connector proposal
+description: Discuss a new source adapter before implementation.
+body:
+  - type: textarea
+    id: source
+    attributes:
+      label: Storage, format, shape, and use case
+      description: Distinguish where data lives from its encoding and tabular/nested structure.
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Discovery, reads, limits, and credential handling
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Synthetic fixtures, failure cases, and validation plan
+    validations:
+      required: true
