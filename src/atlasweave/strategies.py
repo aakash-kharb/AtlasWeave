@@ -187,7 +187,7 @@ def join_evidence(left: ColumnProfile, right: ColumnProfile, lv: Counter, rv: Co
     }
 
 
-def suggest(left: Dataset, right: Dataset, config: StrategyConfig):
+def suggest(left: Dataset, right: Dataset, config: StrategyConfig, manual_pairs=()):
     lp, lc = profile(left, config)
     rp, rc = profile(right, config)
     candidates = []
@@ -199,7 +199,10 @@ def suggest(left: Dataset, right: Dataset, config: StrategyConfig):
             score = sum(scores[k] * w for k, w in config.weights.items()) / sum(
                 config.weights.values()
             )
-            if score < config.min_score or not (scores["name"] or scores["overlap"]):
+            manual = {"left_field": a.id, "right_field": b.id} in manual_pairs
+            if not manual and (
+                score < config.min_score or not (scores["name"] or scores["overlap"])
+            ):
                 continue
             candidates.append(
                 {

@@ -1,6 +1,6 @@
 # Releasing
 
-No package publication or release workflow is configured yet. The package version is `0.1.0a1`; the changelog remains Unreleased. A GitHub repository does not imply a PyPI package has been reserved or published.
+No package publication or release workflow is configured yet. The package version is `0.2.0a1`; the browser milestone remains Unreleased. A GitHub repository does not imply a PyPI package has been reserved or published.
 
 Before releasing:
 

@@ -57,6 +57,27 @@
       "items": {
         "$ref": "#/$defs/candidate"
       }
+    },
+    "manual_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "left_field": {
+            "type": "string"
+          },
+          "right_field": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "left_field",
+          "right_field"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true,
+      "maxItems": 10000
     }
   },
   "required": [

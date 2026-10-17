@@ -31,6 +31,11 @@ def parser():
     )
     root.add_argument("--version", action="version", version=__version__)
     commands = root.add_subparsers(dest="command", required=True)
+    serve = commands.add_parser("serve", help="Open the local browser workspace")
+    serve.add_argument(
+        "--port", type=int, default=8765, help="Loopback port (0 chooses a free port)"
+    )
+    serve.add_argument("--no-browser", action="store_true", help="Print the URL without opening it")
     sheets = commands.add_parser("sheets", help="List available datasets/worksheets")
     sheets.add_argument("source", type=Path)
     find = commands.add_parser("discover", help="Profile two files and suggest joins")
@@ -100,7 +105,11 @@ def show(project, query=""):
 
 
 def run(args):
-    if args.command == "sheets":
+    if args.command == "serve":
+        from atlasweave.server import serve
+
+        serve(args.port, open_browser=not args.no_browser)
+    elif args.command == "sheets":
         print(json.dumps(adapter_for(str(args.source)).discover(str(args.source)), indent=2))
     elif args.command == "discover":
         raw = read_json(args.config) if args.config else {}

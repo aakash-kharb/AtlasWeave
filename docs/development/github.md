@@ -1,41 +1,49 @@
 # Working with GitHub
 
-The workspace was cloned from `https://github.com/aakash-kharb/AtlasWeave`; `origin` and the original MIT-license commit are already present. Do not run `git init` or force-push over that history. Implementation files are uncommitted for your review.
+The foundation is merged. The local browser milestone is on `feat/local-browser-workspace`, with uncommitted changes ready for review. `origin` already points at `https://github.com/aakash-kharb/AtlasWeave`; do not run `git init` or force-push.
 
-## Publish the first implementation
-
-Run from the existing checkout:
+## Publish this milestone
 
 ```bash
 cd "$HOME/Downloads/AtlasWeave"
 source .venv/bin/activate
 git status --short --branch
-git remote -v
-git switch -c feat/mapping-foundation
-python -m pytest && ruff check . && ruff format --check .
+python -m pytest
+ruff check .
+ruff format --check .
+python -m build
 ```
 
-After the checks pass, review the files, then commit and publish the branch:
+Review the changes and staged filenames before committing. `local-data/`, `outputs/`, environments, and build artifacts are ignored; never add private source files elsewhere.
 
 ```bash
+git diff --stat
 git add .
 git diff --cached --stat
 git diff --cached --check
-git commit -m "Build AtlasWeave CSV and Excel mapping foundation"
-git push -u origin feat/mapping-foundation
-gh pr create --base main --head feat/mapping-foundation \
-  --title "Build CSV and Excel mapping foundation" \
-  --body "Add local import, evidence-backed suggestions, explicit review, versioned mapping and agent exports, documentation, and CI. Includes synthetic parser and workflow tests. Visualization remains deferred."
+git commit -m "Add local browser mapping workspace and repository maintenance"
+git push -u origin feat/local-browser-workspace
+gh pr create --base main --head feat/local-browser-workspace \
+  --title "Add local browser mapping workspace" \
+  --body "Add authenticated loopback CSV/Excel import, evidence review, manual field pairs, comparison, project persistence, and mapping/agent exports. Include browser boundary tests, packaged assets, dependency compatibility CI, and maintenance documentation."
 ```
 
-If `gh` needs authentication, run `gh auth login` and `gh auth setup-git`. If the branch already exists, use `git switch feat/mapping-foundation`. These commands publish only when you run them. Inspect CI and the PR before merging.
+These publishing commands have not been run for you. If authentication is needed, use `gh auth login` and `gh auth setup-git`. Resolve any main-branch changes through a normal merge or rebase and re-run checks; never bypass the ruleset. Once the PR exists, use `gh pr checks --required --watch` and review it before merging.
 
-## Future work
+## Repository maintenance
+
+Main now requires PRs and the two Python CI jobs; force pushes and deletion are blocked. Review approvals remain optional for the solo maintainer. Security alerts and private vulnerability reporting are enabled. See [repository maintenance](repository-maintenance.md) for the active ruleset, the three existing Dependabot PRs, merge commands, and lock-file policy.
+
+The revised Dependabot schedule/grouping and CI compatibility check take effect after this branch is merged. No automatic merging is configured. A private conduct-reporting contact remains an owner decision.
+
+## Start later work
+
+From a clean working tree after the current PR is merged:
 
 ```bash
 git switch main
 git pull --ff-only
-git switch -c feat/describe-your-change
+git switch -c codex/describe-your-change
 # Edit and run the documented checks.
 git add path/to/changed-files
 git commit -m "Describe the user-facing change"
@@ -43,13 +51,4 @@ git push -u origin HEAD
 gh pr create
 ```
 
-## Repository settings to configure
-
-- Enable private vulnerability reporting before inviting security reports.
-- Enable Issues and retain the bug/feature/connector/strategy templates.
-- After the first CI run, require its Python matrix checks on `main` using a ruleset.
-- Choose review requirements practical for a solo maintainer; do not require an unavailable second reviewer.
-- Limit default Actions permissions to read access and enable dependency alerts/updates.
-- Add a private conduct-reporting contact to the community policy.
-
-No repository settings, remote branches, PRs, or releases are changed by the implementation itself. A hosting/deployment workflow is deferred until there is a web application to deploy.
+AtlasWeave runs locally. No remote hosting or deployment is required.

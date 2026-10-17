@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="Discover, review, and export relationships between your local data files."
+        />
+        <title>AtlasWeave · Mapping workspace</title>
+        <link rel="icon" href="/mark.png" />
+        <link rel="stylesheet" href="/styles.css" />
+        <script src="/app.js" defer></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to workspace</a>
+        <div class="app-shell">
+            <aside class="sidebar" aria-label="Workspace navigation">
+                <a class="brand" href="#main"
+                    ><span class="brand-mark"
+                        ><img src="/mark.png" alt="" /></span
+                    ><span>AtlasWeave<small>FIND THE THREADS</small></span></a
+                >
+                <p class="nav-caption">YOUR WORKSPACE</p>
+                <nav>
+                    <a href="#sources" class="nav-link"
+                        ><span>01</span> Sources
+                        <span id="nav-source-count" class="nav-count"
+                            >0</span
+                        ></a
+                    >
+                    <a href="#relationships" class="nav-link"
+                        ><span>02</span> Relationships
+                        <span id="nav-candidate-count" class="nav-count"
+                            >0</span
+                        ></a
+                    >
+                    <a href="#handoff" class="nav-link"
+                        ><span>03</span> Agent handoff
+                        <span class="nav-arrow">↗</span></a
+                    >
+                </nav>
+                <div class="sidebar-note">
+                    <span class="tiny-star">✳</span>
+                    <h2>From scattered files<br />to a shared language.</h2>
+                    <p>
+                        Every connection comes with evidence. You decide what
+                        belongs together.
+                    </p>
+                </div>
+                <div class="sidebar-bottom">
+                    <span class="local-dot"></span> Local workspace
+                    <small id="version">ALPHA</small>
+                </div>
+            </aside>
+            <main id="main" tabindex="-1">
+                <header class="topbar">
+                    <span
+                        >Workspace <span class="muted">/</span>
+                        <strong>Untitled mapping</strong></span
+                    >
+                    <div class="topbar-actions">
+                        <button
+                            id="restore-button"
+                            class="text-button"
+                            disabled
+                        >
+                            Open project</button
+                        ><input
+                            id="restore-input"
+                            type="file"
+                            accept=".json,application/json"
+                            hidden
+                        /><button
+                            id="save-project"
+                            class="button small secondary"
+                            disabled
+                        >
+                            Save project ↓
+                        </button>
+                    </div>
+                </header>
+                <div class="content">
+                    <section class="intro">
+                        <div>
+                            <p class="eyebrow">
+                                A LITTLE ORDER. A LOT OF POSSIBILITY.
+                            </p>
+                            <h1>Make the connection.</h1>
+                            <p class="subtitle">
+                                Bring your files together. Find the
+                                relationships. Take the next step with
+                                confidence.
+                            </p>
+                        </div>
+                        <button id="demo-button" class="button secondary">
+                            Explore sample data <span>↗</span>
+                        </button>
+                    </section>
+                    <div
+                        class="workspace-summary"
+                        aria-label="Workspace summary"
+                    >
+                        <span
+                            ><strong id="summary-files">0</strong> sources
+                            connected</span
+                        ><span
+                            ><strong id="summary-candidates">0</strong>
+                            relationships to explore</span
+                        ><span
+                            ><strong id="summary-approved">0</strong> approved
+                            mappings</span
+                        ><span class="privacy"
+                            ><span class="local-dot"></span> Processed on your
+                            computer</span
+                        >
+                    </div>
+
+                    <section
+                        id="sources"
+                        class="section-block"
+                        aria-labelledby="sources-heading"
+                    >
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-number">01</span>
+                                <h2 id="sources-heading">
+                                    Start with your sources
+                                </h2>
+                            </div>
+                            <span class="section-hint"
+                                >CSV & Excel · Up to 32 MiB each</span
+                            >
+                        </div>
+                        <div class="source-grid">
+                            <article class="source-card" id="left-card">
+                                <div class="source-top">
+                                    <span class="file-icon">↥</span
+                                    ><span class="source-role">LEFT SOURCE</span
+                                    ><span id="left-format" class="pill"
+                                        >INPUT</span
+                                    >
+                                </div>
+                                <h3 id="left-name">
+                                    The records you start with
+                                </h3>
+                                <p id="left-description">
+                                    Orders, transactions, or the rows you want
+                                    to keep.
+                                </p>
+                                <label class="file-picker" for="left-file"
+                                    >Choose a file <span>or drop it here</span
+                                    ><input
+                                        id="left-file"
+                                        type="file"
+                                        accept=".csv,.xlsx"
+                                /></label>
+                                <div
+                                    class="source-options"
+                                    id="left-options"
+                                    hidden
+                                >
+                                    <label id="left-sheet-label" hidden
+                                        >Worksheet<select
+                                            id="left-sheet"
+                                            class="import-setting"
+                                        ></select></label
+                                    ><label
+                                        >Header row<input
+                                            id="left-header"
+                                            class="import-setting"
+                                            type="number"
+                                            min="1"
+                                            max="10000"
+                                            value="1" /></label
+                                    ><label id="left-delimiter-label"
+                                        >Delimiter<select
+                                            id="left-delimiter"
+                                            class="import-setting"
+                                        >
+                                            <option value=",">Comma (,)</option>
+                                            <option value=";">
+                                                Semicolon (;)
+                                            </option>
+                                            <option value="&#9;">Tab</option>
+                                            <option value="|">Pipe (|)</option>
+                                        </select></label
+                                    >
+                                </div>
+                            </article>
+                            <div class="source-connector" aria-hidden="true">
+                                ↔
+                            </div>
+                            <article class="source-card" id="right-card">
+                                <div class="source-top">
+                                    <span class="file-icon">↥</span
+                                    ><span class="source-role"
+                                        >RIGHT SOURCE</span
+                                    ><span id="right-format" class="pill"
+                                        >LOOKUP</span
+                                    >
+                                </div>
+                                <h3 id="right-name">
+                                    The context you connect to
+                                </h3>
+                                <p id="right-description">
+                                    Customers, products, or a reference table.
+                                </p>
+                                <label class="file-picker" for="right-file"
+                                    >Choose a file <span>or drop it here</span
+                                    ><input
+                                        id="right-file"
+                                        type="file"
+                                        accept=".csv,.xlsx"
+                                /></label>
+                                <div
+                                    class="source-options"
+                                    id="right-options"
+                                    hidden
+                                >
+                                    <label id="right-sheet-label" hidden
+                                        >Worksheet<select
+                                            id="right-sheet"
+                                            class="import-setting"
+                                        ></select></label
+                                    ><label
+                                        >Header row<input
+                                            id="right-header"
+                                            class="import-setting"
+                                            type="number"
+                                            min="1"
+                                            max="10000"
+                                            value="1" /></label
+                                    ><label id="right-delimiter-label"
+                                        >Delimiter<select
+                                            id="right-delimiter"
+                                            class="import-setting"
+                                        >
+                                            <option value=",">Comma (,)</option>
+                                            <option value=";">
+                                                Semicolon (;)
+                                            </option>
+                                            <option value="&#9;">Tab</option>
+                                            <option value="|">Pipe (|)</option>
+                                        </select></label
+                                    >
+                                </div>
+                            </article>
+                        </div>
+                        <div class="discovery-controls">
+                            <details id="settings">
+                                <summary>
+                                    Matching settings <span>＋</span>
+                                </summary>
+                                <div class="settings-grid">
+                                    <label
+                                        >Rows to scan per source<input
+                                            id="row-limit"
+                                            class="import-setting"
+                                            type="number"
+                                            min="1"
+                                            max="100000"
+                                            value="10000" /></label
+                                    ><label
+                                        >Minimum suggestion score<input
+                                            id="min-score"
+                                            class="import-setting"
+                                            type="number"
+                                            min="0"
+                                            max="1"
+                                            step="0.05"
+                                            value="0.55" /></label
+                                    ><label class="checkbox-label"
+                                        ><input
+                                            id="trim"
+                                            class="import-setting"
+                                            type="checkbox"
+                                        />
+                                        Trim surrounding spaces</label
+                                    ><label class="checkbox-label"
+                                        ><input
+                                            id="casefold"
+                                            class="import-setting"
+                                            type="checkbox"
+                                        />
+                                        Ignore case in values</label
+                                    ><label class="aliases-label"
+                                        >Column aliases (JSON)<textarea
+                                            id="aliases"
+                                            class="import-setting"
+                                            rows="2"
+                                            spellcheck="false"
+                                        >
+{"cust_id": "Customer ID"}</textarea>
+                                    </label>
+                                </div>
+                                <p class="helper">
+                                    Identifiers keep their leading zeros. Empty
+                                    keys never match each other. A partial scan
+                                    cannot be approved.
+                                </p>
+                            </details>
+                            <button
+                                id="discover-button"
+                                class="button primary"
+                                disabled
+                            >
+                                Discover relationships <span>→</span>
+                            </button>
+                        </div>
+                        <p id="dirty-notice" class="notice" hidden>
+                            Settings changed. Run discovery again to replace
+                            earlier decisions.
+                        </p>
+                        <div id="source-warnings" class="warnings"></div>
+                    </section>
+
+                    <section
+                        id="relationships"
+                        class="section-block"
+                        aria-labelledby="relationships-heading"
+                    >
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-number">02</span>
+                                <h2 id="relationships-heading">
+                                    Explore the relationships
+                                </h2>
+                                <span
+                                    id="relationship-count"
+                                    class="count-badge"
+                                    >0</span
+                                >
+                            </div>
+                            <span class="section-hint"
+                                >Evidence first. Your decision.</span
+                            >
+                        </div>
+                        <div id="empty-review" class="empty-state">
+                            <div class="empty-symbol" aria-hidden="true">
+                                <span>≡</span><i>⤳</i><span>≡</span>
+                            </div>
+                            <h3>A connection starts with two sources.</h3>
+                            <p>
+                                Choose your files above, or explore the
+                                sample.<br />We’ll bring the possible
+                                relationships into focus.
+                            </p>
+                        </div>
+                        <div id="review-workspace" hidden>
+                            <div class="review-toolbar">
+                                <label class="search-label"
+                                    ><span aria-hidden="true">⌕</span
+                                    ><input
+                                        id="search"
+                                        type="search"
+                                        placeholder="Find a field or relationship…"
+                                        aria-label="Search relationships" /></label
+                                ><label class="sr-only" for="status-filter"
+                                    >Review status</label
+                                ><select id="status-filter">
+                                    <option value="all">All decisions</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">
+                                        Rejected
+                                    </option></select
+                                ><button
+                                    id="compare-button"
+                                    class="button secondary small"
+                                    disabled
+                                >
+                                    Compare (0)
+                                </button>
+                            </div>
+                            <div class="review-grid">
+                                <div>
+                                    <div
+                                        id="candidate-list"
+                                        class="candidate-list"
+                                        aria-label="Candidate relationships"
+                                    ></div>
+                                    <p class="helper">
+                                        Select up to 3 checkboxes to compare
+                                        evidence. Scores are rankings, not
+                                        probabilities.
+                                    </p>
+                                </div>
+                                <article
+                                    id="candidate-detail"
+                                    class="detail-panel"
+                                    aria-label="Selected relationship"
+                                ></article>
+                            </div>
+                            <details class="manual-panel">
+                                <summary>
+                                    Have a connection in mind?
+                                    <span>Add a field pair manually ＋</span>
+                                </summary>
+                                <div class="manual-controls">
+                                    <label
+                                        >Left field<select
+                                            id="manual-left"
+                                        ></select></label
+                                    ><span aria-hidden="true">→</span
+                                    ><label
+                                        >Right field<select
+                                            id="manual-right"
+                                        ></select></label
+                                    ><button
+                                        id="manual-button"
+                                        class="button secondary"
+                                    >
+                                        Inspect this pair
+                                    </button>
+                                </div>
+                                <p class="helper">
+                                    Manual pairs receive the same evidence and
+                                    approval checks as suggestions.
+                                </p>
+                            </details>
+                        </div>
+                    </section>
+
+                    <section
+                        id="handoff"
+                        class="section-block"
+                        aria-labelledby="handoff-heading"
+                    >
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-number">03</span>
+                                <h2 id="handoff-heading">
+                                    Ready for the next step
+                                </h2>
+                            </div>
+                            <span class="section-hint"
+                                >A clear plan for your AI agent</span
+                            >
+                        </div>
+                        <div class="handoff-card">
+                            <div class="handoff-icon" aria-hidden="true">↗</div>
+                            <div class="handoff-copy">
+                                <h3>Your decisions, ready to build on.</h3>
+                                <p id="handoff-description">
+                                    Approve a relationship to create your
+                                    mapping specification and agent brief.
+                                </p>
+                                <p class="helper">
+                                    Exports contain metadata and evidence, never
+                                    source rows. Review before sharing.
+                                </p>
+                            </div>
+                            <button
+                                id="prepare-export"
+                                class="button primary"
+                                disabled
+                            >
+                                Prepare handoff <span>→</span>
+                            </button>
+                        </div>
+                        <div id="export-panel" hidden>
+                            <div class="export-heading">
+                                <h3>Reviewed mappings. Clear instructions.</h3>
+                                <div>
+                                    <button
+                                        id="download-mapping"
+                                        class="button secondary small"
+                                    >
+                                        Mapping JSON ↓</button
+                                    ><button
+                                        id="download-brief"
+                                        class="button primary small"
+                                    >
+                                        Agent brief ↓
+                                    </button>
+                                </div>
+                            </div>
+                            <label for="brief-preview" class="eyebrow"
+                                >AGENT BRIEF PREVIEW</label
+                            ><textarea
+                                id="brief-preview"
+                                readonly
+                                rows="12"
+                            ></textarea>
+                            <p class="helper">
+                                An agent must ask for your source files and
+                                verify their hashes. Multiple mappings are
+                                independent joins, not an automatic composite
+                                key.
+                            </p>
+                        </div>
+                    </section>
+                    <footer>
+                        <span
+                            >AtlasWeave <span class="muted">/</span> Find the
+                            threads connecting your data.</span
+                        ><button id="clear-button" class="text-button">
+                            Clear workspace
+                        </button>
+                    </footer>
+                </div>
+            </main>
+        </div>
+        <div
+            id="status-message"
+            class="status-message"
+            role="status"
+            aria-live="polite"
+        ></div>
+        <div id="error-message" class="error-message" role="alert" hidden></div>
+        <dialog id="compare-dialog">
+            <div class="dialog-heading">
+                <h2>Compare the evidence</h2>
+                <button id="close-compare" class="button secondary small">
+                    Close ✕
+                </button>
+            </div>
+            <div id="comparison-content" class="table-scroll"></div>
+            <p class="helper">
+                Compare meaning as well as numbers. A shared code can refer to
+                different things in different systems.
+            </p>
+        </dialog>
+    </body>
+</html>

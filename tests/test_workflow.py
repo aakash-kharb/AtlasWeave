@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
+from atlasweave import __version__
 from atlasweave.cli import main
 from atlasweave.exporters import agent_brief, export_mapping
 from atlasweave.models import AtlasWeaveError, ReadOptions
@@ -162,7 +163,7 @@ def test_cli_module_entrypoint():
         [sys.executable, "-m", "atlasweave", "--version"], capture_output=True, text=True
     )
     assert result.returncode == 0
-    assert "0.1.0a1" in result.stdout
+    assert __version__ in result.stdout
 
 
 def test_schemas_are_valid_and_strict(sources, tmp_path):

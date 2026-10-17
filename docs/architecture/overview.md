@@ -10,6 +10,8 @@ The first implementation is one Python package with explicit module boundaries. 
 | `project.py` | Schema validation, snapshots, persistence, review rules, freshness checks |
 | `exporters.py` | Mapping JSON and deterministic agent brief |
 | `cli.py` | Argument parsing and workflow orchestration |
+| `server.py` | Authenticated loopback HTTP API, temporary upload lifecycle, workspace revisions |
+| `web/` | Packaged HTML/CSS/JavaScript, supplied logo, synthetic demo CSVs |
 
 Data flows from adapter → bounded dataset → profiles/candidates → saved review → validated export. Core modules do not depend on a GUI, web framework, model provider, or canvas state.
 
@@ -25,8 +27,14 @@ Strategies receive two column profiles, normalized non-null value counters, and 
 
 ## Export contract
 
-The CLI calls `verify_project` before review/export. Library callers must do the same before using `decide`/`export_mapping`. Export checks approval constraints but does not locate sources on its own. Consumers validate the versioned schema and treat imported text as data. No adapter credentials, raw values, or inferred executable transformations enter the handoff.
+The CLI and browser server call `verify_project` before review/export. Library callers must do the same before using `decide`/`export_mapping`. Export checks approval constraints but does not locate sources on its own. Consumers validate the versioned schema and treat imported text as data. No adapter credentials, raw values, or inferred executable transformations enter the handoff.
+
+## Browser boundary
+
+The server binds only to IPv4 loopback and accepts its exact Host plus same-origin requests. All API operations require a random process token. Static routes use an allowlist; upload names cannot contain paths. Saved project paths must match the two registered uploads before the engine reads anything. A workspace lock serializes operations; revisions reject stale tab mutations. The server never serves uploaded source bytes. The browser inserts metadata with textContent/DOM APIs, not HTML interpolation, and uses a restrictive content security policy.
+
+The single local session stores upload copies in an OS temporary directory and keeps project state in memory. Explicit downloads provide persistence. Graceful shutdown and Clear workspace remove temporary files; a hard crash can leave them behind. No claim of a hostile multi-user or internet-facing server is made.
 
 ## Scaling path
 
-Current datasets and distinct counters are in memory; scoring considers all field pairs. Later work can introduce streaming profiles, candidate filtering, selective full validation, cancellation/progress, and database pushdown. A browser can call a local service or a separately packaged engine while retaining the mapping contract. There is no claim of browser-only processing today.
+Current datasets and distinct counters are in memory; scoring considers all field pairs. Later work can introduce streaming profiles, candidate filtering, selective full validation, cancellation/progress, and database pushdown. The browser calls the local Python service; processing is not browser-only.

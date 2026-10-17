@@ -94,12 +94,18 @@ def read_source(path: Path, options: ReadOptions, project_dir: Path):
 
 
 def discover(
-    left: Path, right: Path, project_dir: Path, left_options=None, right_options=None, config=None
+    left: Path,
+    right: Path,
+    project_dir: Path,
+    left_options=None,
+    right_options=None,
+    config=None,
+    manual_pairs=(),
 ):
     config = config or StrategyConfig()
     lm, ld = read_source(left, left_options or ReadOptions(), project_dir)
     rm, rd = read_source(right, right_options or ReadOptions(), project_dir)
-    lp, rp, candidates = suggest(ld, rd, config)
+    lp, rp, candidates = suggest(ld, rd, config, manual_pairs)
     document = {
         "schema_version": 1,
         "engine_version": __version__,
@@ -108,6 +114,12 @@ def discover(
         "profiles": {"left": lp, "right": rp},
         "candidates": candidates,
     }
+    if manual_pairs:
+        for pair in manual_pairs:
+            for side, profiles in (("left", lp), ("right", rp)):
+                if pair[f"{side}_field"] not in {field["id"] for field in profiles}:
+                    raise AtlasWeaveError("Unknown field in manual mapping.")
+        document["manual_pairs"] = list(manual_pairs)
     document["discovery_fingerprint"] = discovery_fingerprint(document)
     validate_document(document)
     return document
@@ -125,6 +137,11 @@ def discovery_fingerprint(project):
 
 def load_project(path: Path):
     project = read_json(path)
+    validate_project(project)
+    return project
+
+
+def validate_project(project):
     validate_document(project)
     StrategyConfig(**project["config"])
     if discovery_fingerprint(project) != project["discovery_fingerprint"]:
@@ -159,6 +176,7 @@ def verify_project(project, project_dir: Path):
         ReadOptions(**sources["left"]["options"]),
         ReadOptions(**sources["right"]["options"]),
         StrategyConfig(**project["config"]),
+        project.get("manual_pairs", ()),
     )
     actual = [{**c, "status": "pending", "rules": None} for c in project["candidates"]]
     if (
@@ -167,6 +185,32 @@ def verify_project(project, project_dir: Path):
         or project["sources"] != fresh["sources"]
     ):
         raise AtlasWeaveError("Evidence or settings changed; rediscover and review again.")
+
+
+def add_manual_pair(project, project_dir: Path, left_field: str, right_field: str):
+    """Add one inspected pair without relaxing approval rules or losing existing decisions."""
+    verify_project(project, project_dir)
+    pair = {"left_field": left_field, "right_field": right_field}
+    pairs = list(project.get("manual_pairs", ()))
+    if pair in pairs:
+        return project
+    pairs.append(pair)
+    sources = project["sources"]
+    fresh = discover(
+        project_dir / sources["left"]["path"],
+        project_dir / sources["right"]["path"],
+        project_dir,
+        ReadOptions(**sources["left"]["options"]),
+        ReadOptions(**sources["right"]["options"]),
+        StrategyConfig(**project["config"]),
+        pairs,
+    )
+    old = {candidate["id"]: candidate for candidate in project["candidates"]}
+    for candidate in fresh["candidates"]:
+        previous = old.get(candidate["id"])
+        if previous:
+            candidate.update(status=previous["status"], rules=previous["rules"])
+    return fresh
 
 
 def validate_approval(candidate, rules):
