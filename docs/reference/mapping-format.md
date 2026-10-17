@@ -8,6 +8,8 @@ Both contracts use JSON Schema draft 2020-12 and `schema_version: 1`, independen
 
 Candidate IDs combine positional field IDs. The source hash binds those positions to exact file contents. A candidate has component scores, join evidence, full/sample scope, pending/approved/rejected status, and join rules only when approved. `review --status pending` resets a decision. There is no review-history ledger yet.
 
+Version 0.2 adds an optional `manual_pairs` array of `{left_field, right_field}` selections to project-v1. These pairs bypass ranking cutoffs only; they still require full evidence, overlap, and valid join rules. They are included in the discovery fingerprint and evidence recomputation. Adding a pair preserves existing decisions after revalidation; rediscovery resets the list and decisions. The exported mapping-v1 shape is unchanged. Older engines cannot load projects containing this new optional field, and engine-version changes require rediscovery.
+
 The discovery fingerprint covers engine/configuration, source metadata, profiles, and evidence, excluding review status/rules. It detects accidental changes; it is not a signature or a malicious-editor trust boundary. Review/export re-read source hashes and recompute evidence. Changing even unused bytes in a workbook invalidates review. Modifying options, names, or normalization requires rediscovery.
 
 ## Agent handoff

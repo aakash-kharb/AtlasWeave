@@ -12,4 +12,7 @@
 - When contracts change, edit `scripts/generate_schemas.py`, regenerate schemas, and update docs/tests.
 - Package changes also require `python -m build` and an installed-wheel smoke test.
 - Update documentation and changelog for behavior changes. Do not claim planned features work.
-- Do not add branding images or a visualization/canvas as part of this initial milestone.
+- The second milestone is a local browser workspace. Keep visuals symbolic and direct; use the
+  supplied logo without altering its source image. No remote hosting or model calls are required.
+- Browser API endpoints must bind to loopback, validate Host/Origin, require the session token,
+  and never accept arbitrary filesystem paths. Test these boundaries when changing the server.

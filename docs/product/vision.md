@@ -14,4 +14,4 @@ A field mapping links columns conceptually. A join combines rows under specific 
 
 ## Deferred
 
-Browser UI and symbolic visual identity, arbitrary transformations, composite keys, fuzzy entity resolution, multi-table planning, SQL/NoSQL/cloud/service connectors, credentials, scheduling, production execution, AI model calls, and collaborative editing.
+Final logo refinement, arbitrary transformations, composite keys, fuzzy entity resolution, multi-table planning, SQL/NoSQL/cloud/service connectors, credentials, scheduling, production execution, AI model calls, and collaborative editing. A local browser workspace is now implemented alongside the CLI.

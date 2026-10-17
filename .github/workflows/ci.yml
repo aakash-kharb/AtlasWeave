@@ -12,6 +12,7 @@ jobs:
   checks:
     name: Python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         python: ['3.11', '3.13']
@@ -27,6 +28,14 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: python -m pytest
+      - run: node --check src/atlasweave/web/app.js
+      - name: Test the dependency versions allowed by pyproject
+        shell: bash
+        run: |
+          python -m venv /tmp/atlasweave-compatible
+          /tmp/atlasweave-compatible/bin/pip install -e '.[dev]'
+          /tmp/atlasweave-compatible/bin/python -m pip check
+          /tmp/atlasweave-compatible/bin/python -m pytest
       - run: python scripts/generate_schemas.py && git diff --exit-code -- src/atlasweave/schemas
       - run: python -m build
       - name: Installed-wheel workflow
@@ -35,6 +44,7 @@ jobs:
           python -m venv /tmp/atlasweave-wheel
           /tmp/atlasweave-wheel/bin/pip install dist/*.whl
           cd /tmp
+          /tmp/atlasweave-wheel/bin/python "$GITHUB_WORKSPACE/scripts/smoke_browser.py"
           /tmp/atlasweave-wheel/bin/atlasweave discover \
             "$GITHUB_WORKSPACE/examples/orders.csv" "$GITHUB_WORKSPACE/examples/customers.csv" \
             --out /tmp/atlasweave-check/project.json

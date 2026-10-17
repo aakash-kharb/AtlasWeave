@@ -152,6 +152,11 @@ schemas = {
         }
     ),
 }
+schemas["project-v1"]["properties"]["manual_pairs"] = {
+    **array(obj({"left_field": text, "right_field": text})),
+    "uniqueItems": True,
+    "maxItems": 10000,
+}
 
 if __name__ == "__main__":
     target = Path(__file__).resolve().parents[1] / "src/atlasweave/schemas"

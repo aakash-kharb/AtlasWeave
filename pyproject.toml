@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atlasweave"
-version = "0.1.0a1"
+version = "0.2.0a1"
 description = "Discover how your data connects. Review the evidence. Export an agent-ready mapping."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,7 +27,7 @@ Issues = "https://github.com/aakash-kharb/AtlasWeave/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-atlasweave = ["schemas/*.json"]
+atlasweave = ["schemas/*.json", "web/*.html", "web/*.css", "web/*.js", "web/*.png", "web/*.csv"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -36,6 +36,7 @@ pythonpath = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["build", "dist"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]

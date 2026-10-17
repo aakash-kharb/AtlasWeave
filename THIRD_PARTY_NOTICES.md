@@ -12,4 +12,4 @@ Direct runtime dependencies:
 
 These packages are installed from their distributions rather than copied into this repository. Their distributions contain the authoritative license texts and notices. Review transitive dependencies when distributing a bundled application.
 
-Examples and tests use synthetic data created for this project. No code or visual assets were copied from M3E Canvas or Anatomy; their contribution practices informed the planning discussion.
+Examples and tests use synthetic data created for this project. The logo was supplied by the repository owner and is packaged unchanged as `src/atlasweave/web/mark.png`; retain provenance for any future redistributed artwork. No code or visual assets were copied from M3E Canvas or Anatomy; their contribution practices informed the planning discussion.
