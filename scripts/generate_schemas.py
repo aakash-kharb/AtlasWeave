@@ -99,11 +99,13 @@ definitions["candidate"] = obj(
         "rules": {"anyOf": [ref("rules"), {"type": "null"}]},
     }
 )
+# Optional for existing CSV/XLSX projects; required and nonempty for SQLite below.
+definitions["options"]["properties"]["table"] = {"type": ["string", "null"], "minLength": 1}
 source = {
     "name": text,
     "sha256": sha,
     "storage": enum("file"),
-    "format": enum("csv", "xlsx"),
+    "format": enum("csv", "xlsx", "sqlite"),
     "shape": enum("table"),
     "options": ref("options"),
     "row_count": count,
@@ -111,6 +113,26 @@ source = {
 }
 definitions["source"] = obj({**source, "path": text, "complete": boolean})
 definitions["export_source"] = obj({**source, "fields": array(ref("field"))})
+for name in ("source", "export_source"):
+    definitions[name]["allOf"] = [
+        {
+            "if": {"properties": {"format": {"const": "sqlite"}}},
+            "then": {
+                "properties": {
+                    "options": {
+                        "required": ["table"],
+                        "properties": {
+                            "table": {"type": "string", "minLength": 1},
+                            "sheet": {"type": "null"},
+                            "header_row": {"const": 1},
+                            "delimiter": {"const": ","},
+                        },
+                    }
+                }
+            },
+            "else": {"properties": {"options": {"properties": {"table": {"type": "null"}}}}},
+        }
+    ]
 definitions["approved"] = {
     "allOf": [
         ref("candidate"),

@@ -1,6 +1,6 @@
 # Repository rules and dependency maintenance
 
-Verified on 17 October 2026 for `aakash-kharb/AtlasWeave`.
+Protection settings verified on 17 October 2026; PR merge status checked on 18 October 2026 for `aakash-kharb/AtlasWeave`.
 
 ## Active GitHub settings
 
@@ -18,7 +18,7 @@ Private vulnerability reporting, Dependabot alerts, and automated security-fix P
 
 These choices follow GitHub's [ruleset options](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). Review actual CI job names before changing required checks; a renamed check can block merges until the rule is updated.
 
-## The three current Dependabot PRs
+## Merged Dependabot PRs
 
 | PR | Reviewed change | Evidence and handling |
 | --- | --- | --- |
@@ -28,17 +28,19 @@ These choices follow GitHub's [ruleset options](https://docs.github.com/en/repos
 
 Upstream release references: [checkout](https://github.com/actions/checkout/releases), [setup-python](https://github.com/actions/setup-python/releases). The project uses GitHub-hosted `ubuntu-latest`, not an old self-hosted runner. The browser implementation does not duplicate these upgrade diffs, so the existing PRs remain the upgrade path.
 
-No Dependabot PR has been merged, closed, approved, or commented on by this implementation. For each PR, open it, use **Update branch** if GitHub reports it behind main, wait for its current commit's required checks, inspect Files changed, and squash merge. Handle #2, then #3, then #4; later PRs may need another branch update after earlier merges.
+PRs #2, #3, and #4 are now merged, along with browser workspace PR #5. The SQLite branch refreshes the lock to pytest 9.1.1. The table above records the original review evidence; no action remains on those PRs.
 
-For CLI use, repeat this sequence for each number after reading its diff:
+For future updates, use **Update branch** if GitHub reports the PR behind main, wait for the current commit's required checks, inspect Files changed, and squash merge.
+
+For future CLI use, replace NUMBER with the new PR number after reading its diff:
 
 ```bash
-gh pr view 2 --repo aakash-kharb/AtlasWeave
-gh pr diff 2 --repo aakash-kharb/AtlasWeave
+gh pr view NUMBER --repo aakash-kharb/AtlasWeave
+gh pr diff NUMBER --repo aakash-kharb/AtlasWeave
 # Only when the PR is behind main:
-gh pr update-branch 2 --repo aakash-kharb/AtlasWeave
-gh pr checks 2 --repo aakash-kharb/AtlasWeave --required --watch
-gh pr merge 2 --repo aakash-kharb/AtlasWeave --squash
+gh pr update-branch NUMBER --repo aakash-kharb/AtlasWeave
+gh pr checks NUMBER --repo aakash-kharb/AtlasWeave --required --watch
+gh pr merge NUMBER --repo aakash-kharb/AtlasWeave --squash
 ```
 
 Do not use `--admin` to bypass a failed check. If checks have not appeared yet after a branch update, wait for the new run; the ruleset still prevents a premature merge.

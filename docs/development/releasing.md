@@ -1,11 +1,11 @@
 # Releasing
 
-No package publication or release workflow is configured yet. The package version is `0.2.0a1`; the browser milestone remains Unreleased. A GitHub repository does not imply a PyPI package has been reserved or published.
+No package publication or release workflow is configured yet. The package version is `0.3.0a1`; the browser milestone remains Unreleased. A GitHub repository does not imply a PyPI package has been reserved or published.
 
 Before releasing:
 
 1. Run tests, lint, format, schema regeneration, and a clean wheel build.
-2. Install the wheel in a clean environment and exercise CSV/XLSX discovery → review → export.
+2. Install the wheel in a clean environment and exercise CSV/XLSX/SQLite discovery → review → export.
 3. Review dependencies/notices and inspect distribution contents for private or generated files.
 4. Update the package version in both `pyproject.toml` and `src/atlasweave/__init__.py`; explain compatibility in the changelog.
 5. Document that engine changes require rediscovery; bump schema versions separately for incompatible document changes.

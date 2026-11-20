@@ -5,7 +5,7 @@ The first implementation is one Python package with explicit module boundaries. 
 | Module | Responsibility |
 | --- | --- |
 | `models.py` | `ReadOptions`, `Dataset`, `SourceAdapter` protocol |
-| `adapters.py` | File checks, CSV/XLSX discovery and reading |
+| `adapters.py` | File checks, CSV/XLSX/SQLite discovery and reading |
 | `strategies.py` | Column profiles, `MatchStrategy` protocol/registry, ranking, join evidence |
 | `project.py` | Schema validation, snapshots, persistence, review rules, freshness checks |
 | `exporters.py` | Mapping JSON and deterministic agent brief |
@@ -17,7 +17,7 @@ Data flows from adapter → bounded dataset → profiles/candidates → saved re
 
 ## Adapter contract
 
-Adapters declare storage, format, and shape separately; implement `discover(path)` and `read(path, ReadOptions)`; and return immutable dataset rows, field names, completeness, and warnings. File registration is currently by suffix. SQL/NoSQL source locators and credential handling do not yet exist. Future connectors need a richer source specification and schema update rather than pretending a database is a local path.
+Adapters declare storage, format, and shape separately; implement `discover(path)` and `read(path, ReadOptions)`; and return immutable dataset rows, field names, completeness, and warnings. File registration is currently by suffix. SQLite is a local file source (`storage: file`, `format: sqlite`, `shape: table`) with an explicit `ReadOptions.table` selection. Its bytes are deserialized into an in-memory connection; the original file is never opened by SQLite. Remote SQL/NoSQL source locators and credential handling do not yet exist. Future connectors need a richer source specification and schema update rather than pretending a database is a local path.
 
 Nested documents must preserve their paths/arrays until the user explicitly selects a tabular interpretation. Adding a connector must not change strategy semantics. Contract tests should cover empty sources, nulls, stable field identity, read limits, malformed input, and resource cleanup.
 

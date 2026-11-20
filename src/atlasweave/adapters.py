@@ -2,6 +2,8 @@
 
 import csv
 import re
+import sqlite3
+from contextlib import contextmanager
 from datetime import date, datetime, time
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
@@ -44,6 +46,8 @@ class CsvAdapter:
 
     def read(self, path: str, options: ReadOptions) -> Dataset:
         source = check_file(path)
+        if options.table is not None:
+            raise AtlasWeaveError("Table selection applies only to SQLite files.")
         if options.sheet is not None:
             raise AtlasWeaveError("Sheet selection applies only to XLSX files.")
         try:
@@ -120,6 +124,8 @@ class XlsxAdapter:
             workbook.close()
 
     def read(self, path: str, options: ReadOptions) -> Dataset:
+        if options.table is not None:
+            raise AtlasWeaveError("Table selection applies only to SQLite files.")
         source = check_workbook(path)
         workbook = load_workbook(source, read_only=True, data_only=False, keep_links=False)
         try:
@@ -163,7 +169,134 @@ class XlsxAdapter:
             workbook.close()
 
 
-ADAPTERS: dict[str, SourceAdapter] = {".csv": CsvAdapter(), ".xlsx": XlsxAdapter()}
+@contextmanager
+def sqlite_snapshot(path):
+    """Read a standalone snapshot into memory; never open the source with SQLite."""
+    source = check_file(path)
+    with source.open("rb") as stream:
+        data = stream.read(MAX_FILE_BYTES + 1)
+    if len(data) > MAX_FILE_BYTES:
+        raise AtlasWeaveError("File exceeds the 32 MiB safety limit.")
+    if len(data) < 100 or data[:16] != b"SQLite format 3\x00":
+        raise AtlasWeaveError("Invalid SQLite database file.")
+    if data[18:20] != b"\x01\x01" or any(
+        Path(str(source) + suffix).exists() for suffix in ("-wal", "-shm", "-journal")
+    ):
+        raise AtlasWeaveError(
+            "Use a closed, standalone SQLite snapshot in DELETE journal mode. "
+            "Live/WAL databases and journal sidecars are not supported."
+        )
+    connection = sqlite3.connect(":memory:")
+    try:
+        if not hasattr(connection, "deserialize") or sqlite3.sqlite_version_info < (3, 37, 0):
+            raise AtlasWeaveError("SQLite import requires SQLite 3.37+ with deserialize support.")
+        connection.deserialize(data)
+        connection.execute("PRAGMA trusted_schema = OFF")
+        connection.execute("PRAGMA query_only = ON")
+
+        def authorize(action, name, _argument, _database, _trigger):
+            if action in (sqlite3.SQLITE_SELECT, sqlite3.SQLITE_READ):
+                return sqlite3.SQLITE_OK
+            if action == sqlite3.SQLITE_PRAGMA and name in ("table_list", "table_xinfo"):
+                return sqlite3.SQLITE_OK
+            return sqlite3.SQLITE_DENY
+
+        connection.set_authorizer(authorize)
+        # Cap SQLite VM work as well as the fetched row count.
+        steps = 0
+
+        def bounded_work():
+            nonlocal steps
+            steps += 1
+            return int(steps > 1000)
+
+        connection.set_progress_handler(bounded_work, 10000)
+        yield connection
+    except sqlite3.Error as exc:
+        raise AtlasWeaveError(
+            "Could not read SQLite snapshot: invalid/unsupported content or query work limit."
+        ) from exc
+    finally:
+        connection.close()
+
+
+def sqlite_tables(connection):
+    entries = connection.execute("PRAGMA main.table_list").fetchmany(1001)
+    if len(entries) > 1000:
+        raise AtlasWeaveError("SQLite snapshot exceeds the 1000-table catalog limit.")
+    return sorted(
+        name
+        for schema, name, kind, *_ in entries
+        if schema == "main" and kind == "table" and not name.startswith("sqlite_")
+    )
+
+
+def sql_identifier(name):
+    # SQLite parameters bind values, not identifiers. Only discovered names reach this.
+    return '"' + name.replace('"', '""') + '"'
+
+
+def sqlite_text(value):
+    if isinstance(value, bytes):
+        raise AtlasWeaveError("SQLite BLOB cells are unsupported; export text columns first.")
+    if value is None or value == "":
+        return None
+    # Preserve TEXT identifiers exactly; do not apply numeric affinity or SQL casts.
+    return value if isinstance(value, str) else str(value)
+
+
+class SqliteAdapter:
+    storage, format, shape = "file", "sqlite", "table"
+
+    def discover(self, path: str) -> list[str]:
+        with sqlite_snapshot(path) as connection:
+            names = sqlite_tables(connection)
+            if not names:
+                raise AtlasWeaveError("SQLite snapshot has no supported ordinary tables.")
+            return names
+
+    def read(self, path: str, options: ReadOptions) -> Dataset:
+        if options.sheet is not None or options.header_row != 1 or options.delimiter != ",":
+            raise AtlasWeaveError("SQLite uses table columns; sheet/header/delimiter do not apply.")
+        with sqlite_snapshot(path) as connection:
+            names = sqlite_tables(connection)
+            if options.table is None:
+                raise AtlasWeaveError("Select a SQLite table with --left-table or --right-table.")
+            if options.table not in names:
+                raise AtlasWeaveError("Unknown or unsupported SQLite table; list tables first.")
+            table = sql_identifier(options.table)
+            columns = connection.execute(f"PRAGMA main.table_xinfo({table})").fetchall()
+            if any(column[6] != 0 for column in columns):
+                raise AtlasWeaveError("SQLite generated/hidden columns are unsupported.")
+            original_names = [column[1] for column in columns]
+            names = headers(original_names)
+            if tuple(original_names) != names:
+                raise AtlasWeaveError("Rename SQLite columns with surrounding whitespace first.")
+            selection = ", ".join(sql_identifier(name) for name in names)
+            # No user SQL, views, virtual tables, functions, or SQL-side key coercion.
+            cursor = connection.execute(
+                f"SELECT {selection} FROM main.{table} LIMIT ?", (options.max_rows + 1,)
+            )
+            rows = cursor.fetchmany(options.max_rows + 1)
+            complete = len(rows) <= options.max_rows
+            rows = tuple(tuple(sqlite_text(v) for v in row) for row in rows[: options.max_rows])
+            return Dataset(
+                Path(path).name,
+                names,
+                rows,
+                complete,
+                (
+                    "SQLite stored values are used. Zeros already lost to numeric affinity cannot "
+                    "be recovered. Only ordinary tables from standalone snapshots are supported.",
+                ),
+            )
+
+
+ADAPTERS: dict[str, SourceAdapter] = {
+    ".csv": CsvAdapter(),
+    ".xlsx": XlsxAdapter(),
+    **{suffix: SqliteAdapter() for suffix in (".sqlite", ".sqlite3", ".db")},
+}
 
 
 def adapter_for(path: str) -> SourceAdapter:
@@ -171,5 +304,5 @@ def adapter_for(path: str) -> SourceAdapter:
         return ADAPTERS[Path(path).suffix.lower()]
     except KeyError as exc:
         raise AtlasWeaveError(
-            "Supported file formats: .csv and .xlsx (not .xls or .xlsm)."
+            "Supported file formats: .csv, .xlsx, .sqlite, .sqlite3, and .db."
         ) from exc

@@ -1,6 +1,6 @@
 # Working with GitHub
 
-The foundation is merged. The local browser milestone is on `feat/local-browser-workspace`, with uncommitted changes ready for review. `origin` already points at `https://github.com/aakash-kharb/AtlasWeave`; do not run `git init` or force-push.
+The foundation, local browser workspace, and dependency PRs #2–#5 are merged. SQLite snapshot support is on `codex/sqlite-sources`, with uncommitted changes ready for review. `origin` already points at `https://github.com/aakash-kharb/AtlasWeave`; do not run `git init` or force-push.
 
 ## Publish this milestone
 
@@ -21,20 +21,20 @@ git diff --stat
 git add .
 git diff --cached --stat
 git diff --cached --check
-git commit -m "Add local browser mapping workspace and repository maintenance"
-git push -u origin feat/local-browser-workspace
-gh pr create --base main --head feat/local-browser-workspace \
-  --title "Add local browser mapping workspace" \
-  --body "Add authenticated loopback CSV/Excel import, evidence review, manual field pairs, comparison, project persistence, and mapping/agent exports. Include browser boundary tests, packaged assets, dependency compatibility CI, and maintenance documentation."
+git commit -m "Add read-only SQLite snapshot sources"
+git push -u origin codex/sqlite-sources
+gh pr create --base main --head codex/sqlite-sources \
+  --title "Add read-only SQLite snapshot sources" \
+  --body "Add ordinary-table selection for standalone SQLite snapshots in CLI and browser, preserve text identifiers, bind table metadata to reviewed exports, and test import boundaries. Refresh the pytest lock and document SQLite limits."
 ```
 
 These publishing commands have not been run for you. If authentication is needed, use `gh auth login` and `gh auth setup-git`. Resolve any main-branch changes through a normal merge or rebase and re-run checks; never bypass the ruleset. Once the PR exists, use `gh pr checks --required --watch` and review it before merging.
 
 ## Repository maintenance
 
-Main now requires PRs and the two Python CI jobs; force pushes and deletion are blocked. Review approvals remain optional for the solo maintainer. Security alerts and private vulnerability reporting are enabled. See [repository maintenance](repository-maintenance.md) for the active ruleset, the three existing Dependabot PRs, merge commands, and lock-file policy.
+Main now requires PRs and the two Python CI jobs; force pushes and deletion are blocked. Review approvals remain optional for the solo maintainer. Security alerts and private vulnerability reporting are enabled. See [repository maintenance](repository-maintenance.md) for the active ruleset, the merged Dependabot PRs, merge commands, and lock-file policy.
 
-The revised Dependabot schedule/grouping and CI compatibility check take effect after this branch is merged. No automatic merging is configured. A private conduct-reporting contact remains an owner decision.
+The Dependabot schedule/grouping and CI compatibility check are active on main. No automatic merging is configured. A private conduct-reporting contact remains an owner decision.
 
 ## Start later work
 

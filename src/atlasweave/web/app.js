@@ -136,20 +136,28 @@ function renderSources() {
     for (const side of ["left", "right"]) {
         const source = state.sources[side];
         const select = $(`${side}-sheet`);
+        const database = source?.format === "sqlite";
+        const selections = database ? source.tables : source?.sheets || [];
         const sourceKey = source
-            ? `${source.name}:${source.bytes}:${source.sheets.join("|")}`
+            ? `${source.name}:${source.bytes}:${JSON.stringify(selections)}`
             : "";
         if (select.dataset.source !== sourceKey) {
             select.replaceChildren();
-            for (const sheet of source?.sheets || [])
+            for (const sheet of selections)
                 select.append(new Option(sheet, sheet));
             select.dataset.source = sourceKey;
             $(`${side}-header`).value = 1;
             $(`${side}-delimiter`).value = ",";
         }
         $(`${side}-options`).hidden = !source;
-        $(`${side}-sheet-label`).hidden = source?.format !== "xlsx";
-        $(`${side}-delimiter-label`).hidden = source?.format === "xlsx";
+        $(`${side}-sheet-label`).hidden =
+            source?.format !== "xlsx" && !database;
+        $(`${side}-selection-name`).textContent = database
+            ? "Table"
+            : "Worksheet";
+        $(`${side}-delimiter-label`).hidden = source?.format !== "csv";
+        $(`${side}-header`).parentElement.hidden = database;
+        $(`${side}-sqlite-note`).hidden = !database;
         $(`${side}-format`).textContent = source
             ? source.format.toUpperCase()
             : side === "left"
@@ -170,7 +178,10 @@ function renderSources() {
                 : "Customers, products, or a reference table.";
         if (measured && !dirty) {
             select.value =
-                measured.options.sheet || select.options[0]?.value || "";
+                measured.options.table ||
+                measured.options.sheet ||
+                select.options[0]?.value ||
+                "";
             $(`${side}-header`).value = measured.options.header_row;
             $(`${side}-delimiter`).value = measured.options.delimiter;
         }
@@ -360,8 +371,12 @@ function renderDetail() {
     const diagram = node("div", null, "relationship-diagram");
     for (const side of ["left", "right"]) {
         const box = node("div", null, "field-node");
+        const tableName = state.project.sources[side].options.table;
         box.append(
-            node("small", state.sources[side].name),
+            node(
+                "small",
+                state.sources[side].name + (tableName ? ` · ${tableName}` : ""),
+            ),
             node("strong", field(side, candidate[`${side}_field`]).name),
         );
         if (side === "right")
@@ -549,8 +564,8 @@ function download(name, data, mime) {
 
 async function upload(side, file) {
     if (!file) return;
-    if (!/\.(csv|xlsx)$/i.test(file.name))
-        throw new Error("Choose a CSV or XLSX file.");
+    if (!/\.(csv|xlsx|sqlite|sqlite3|db)$/i.test(file.name))
+        throw new Error("Choose a CSV, XLSX, or standalone SQLite file.");
     if (file.size > 32 * 1024 * 1024)
         throw new Error("This file exceeds the 32 MiB limit.");
     const query = new URLSearchParams({
@@ -628,8 +643,18 @@ $("discover-button").addEventListener("click", () =>
                     state.sources[side].format === "xlsx"
                         ? $(`${side}-sheet`).value
                         : null,
-                delimiter: $(`${side}-delimiter`).value,
-                header_row: Number($(`${side}-header`).value),
+                table:
+                    state.sources[side].format === "sqlite"
+                        ? $(`${side}-sheet`).value
+                        : null,
+                delimiter:
+                    state.sources[side].format === "csv"
+                        ? $(`${side}-delimiter`).value
+                        : ",",
+                header_row:
+                    state.sources[side].format === "sqlite"
+                        ? 1
+                        : Number($(`${side}-header`).value),
                 max_rows: Number($("row-limit").value),
             };
         sync(await api("discover", payload));

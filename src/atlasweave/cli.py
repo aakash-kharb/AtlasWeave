@@ -36,7 +36,9 @@ def parser():
         "--port", type=int, default=8765, help="Loopback port (0 chooses a free port)"
     )
     serve.add_argument("--no-browser", action="store_true", help="Print the URL without opening it")
-    sheets = commands.add_parser("sheets", help="List available datasets/worksheets")
+    sheets = commands.add_parser(
+        "sheets", aliases=["tables"], help="List worksheets or SQLite tables"
+    )
     sheets.add_argument("source", type=Path)
     find = commands.add_parser("discover", help="Profile two files and suggest joins")
     find.add_argument(
@@ -48,6 +50,7 @@ def parser():
     find.add_argument("--max-rows", type=int, default=10_000)
     for side in ("left", "right"):
         find.add_argument(f"--{side}-sheet")
+        find.add_argument(f"--{side}-table", help="Ordinary table in a SQLite snapshot")
         find.add_argument(f"--{side}-delimiter", default=",")
         find.add_argument(f"--{side}-header-row", type=int, default=1)
     inspect = commands.add_parser("inspect", help="Read evidence and search field names")
@@ -109,7 +112,7 @@ def run(args):
         from atlasweave.server import serve
 
         serve(args.port, open_browser=not args.no_browser)
-    elif args.command == "sheets":
+    elif args.command in ("sheets", "tables"):
         print(json.dumps(adapter_for(str(args.source)).discover(str(args.source)), indent=2))
     elif args.command == "discover":
         raw = read_json(args.config) if args.config else {}
@@ -125,6 +128,7 @@ def run(args):
         options = {
             side: ReadOptions(
                 sheet=getattr(args, f"{side}_sheet"),
+                table=getattr(args, f"{side}_table"),
                 delimiter=getattr(args, f"{side}_delimiter"),
                 header_row=getattr(args, f"{side}_header_row"),
                 max_rows=args.max_rows,

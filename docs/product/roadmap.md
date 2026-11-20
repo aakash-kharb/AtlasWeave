@@ -12,15 +12,17 @@
 
 Acceptance example: `cust_id → Customer ID`, two shared keys, two unmatched left rows, three inner-join rows, five left-join rows. Mixed XLSX/CSV workflow has a generated synthetic test fixture.
 
-## Milestone 2 — interaction implemented locally
+## Milestone 2 — interaction merged
 
 A local browser interface now provides import/review/export, native keyboard controls, manual field pairs, error states, project save/reopen, and comparison of up to three candidates. Static HTML/CSS/JavaScript is served by the Python package without a frontend build. The user-supplied emblem and navy/ivory palette keep the presentation symbolic and direct.
 
-The browser and CLI share evidence and approval logic. There is no canvas, model-provider integration, hosted deployment, or database connector. Wider accessibility testing and larger-workload benchmarks remain future work.
+The browser and CLI share evidence and approval logic. There is no canvas, model-provider integration, hosted deployment, or remote database connector; local SQLite snapshots arrive in milestone 3. Wider accessibility testing and larger-workload benchmarks remain future work.
 
 ## Milestone 3 — extension
 
-Introduce SQLite/PostgreSQL adapters, query pushdown, cancellation/progress, and benchmarks. Model storage, format, and shape separately. Nested documents and arrays need an explicit interpretation contract before NoSQL adapters are presented as supported.
+The first slice adds read-only SQLite snapshot import in the CLI and browser, explicit ordinary-table selection, bounded reads, and table metadata in saved projects/exports. CSV/Excel/SQLite combinations share the same evidence and approval rules.
+
+Next slices: PostgreSQL connection/credential handling, query pushdown for profiling, cancellation/progress, and published benchmarks. Model storage, format, and shape separately. Nested documents and arrays need an explicit interpretation contract before NoSQL adapters are presented as supported.
 
 ## Before broader release
 

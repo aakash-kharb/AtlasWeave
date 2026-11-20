@@ -19,3 +19,9 @@ The discovery fingerprint covers engine/configuration, source metadata, profiles
 Multiple approved relationships remain independent joins. They are not automatically a composite key or an ordered plan. The brief instructs the receiving agent to clarify composition and source locations, verify hashes, honor null/duplicate/unmatched rules, and obtain authorization before production writes.
 
 The Markdown brief is a deterministic rendering of this same contract. No remote model participates. Imported names and metadata are quoted inside an indented JSON data block and explicitly labeled untrusted. This reduces ambiguity but cannot guarantee how an external agent follows instructions.
+
+## SQLite extension (0.3)
+
+The v1 schemas now accept `format: sqlite` with `storage: file` and `shape: table`. `options.table` is required and nonempty for SQLite; sheet must be null, header_row 1, and delimiter a comma (unused defaults). Other formats permit only a null/absent table selection. New projects serialize table as null for non-SQLite sources. No connection strings, SQL queries, credentials, or database records are exported. The whole standalone file is hashed, including unselected tables.
+
+The table name is included in the discovery fingerprint and export. It is an identifier, never executable SQL; consumers must quote it for their database driver. Existing v1 consumers need updated schema support to accept this extension. Projects from 0.2 require rediscovery under the new engine version; no approval migration is implied.

@@ -1,4 +1,5 @@
 import json
+import sqlite3
 from copy import deepcopy
 from http.client import HTTPConnection
 from io import BytesIO
@@ -251,3 +252,49 @@ def test_http_binary_upload_and_size_limit(http_server):
         http_server, "POST", "/api/upload", b"", {**auth, "Content-Length": str(33 * 1024 * 1024)}
     )
     assert status == 413
+
+
+def test_sqlite_http_upload_selection_restore_and_rejection(http_server):
+    server = http_server
+    auth = {"X-AtlasWeave-Token": server.token, "Content-Type": "application/json"}
+
+    def post(name, **payload):
+        body = json.dumps({"revision": server.workspace.revision, **payload})
+        status, _, response = request(server, "POST", f"/api/{name}", body, auth)
+        assert status == 200, response
+        return json.loads(response)
+
+    post("demo")
+    connection = sqlite3.connect(":memory:")
+    connection.execute('CREATE TABLE "Customers" ("Customer ID" TEXT)')
+    connection.executemany('INSERT INTO "Customers" VALUES (?)', [("001",), ("002",)])
+    content = connection.serialize()
+    connection.close()
+    status, _, response = request(
+        server,
+        "POST",
+        f"/api/upload?side=right&name=lookup.sqlite&revision={server.workspace.revision}",
+        content,
+        {**auth, "Content-Type": "application/octet-stream"},
+    )
+    assert status == 200, response
+    state = json.loads(response)
+    assert state["sources"]["right"]["tables"] == ["Customers"]
+    assert state["project"] is None
+    post("discover", right_options={"table": "Customers"})
+    post("review", candidate="left.f1--right.f1", status="approved", rules=RULES)
+    saved = post("save")["document"]
+    post("restore", document=saved)
+    assert post("export")["mapping"]["sources"]["right"]["options"]["table"] == "Customers"
+    before = deepcopy(server.workspace.state())
+    status, _, _ = request(
+        server,
+        "POST",
+        "/api/discover",
+        json.dumps(
+            {"revision": server.workspace.revision, "right_options": {"table": "../private.sqlite"}}
+        ),
+        auth,
+    )
+    assert status == 400 and server.workspace.state() == before
+    assert request(server, "GET", "/right/lookup.sqlite")[0] == 404

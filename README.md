@@ -2,9 +2,9 @@
 
 **Find the threads connecting your data.**
 
-AtlasWeave discovers possible relationships between CSV and Excel files, explains the evidence, and exports reviewed decisions for an AI agent to implement.
+AtlasWeave discovers possible relationships between CSV, Excel, and SQLite files, explains the evidence, and exports reviewed decisions for an AI agent to implement.
 
-**Status: local browser workspace and CLI alpha.** Import two files, inspect and compare relationships, approve the rules, then download a reusable `mapping.json` and an agent brief. SQL/NoSQL connectors and pipeline execution remain future work.
+**Status: local browser workspace and CLI alpha.** Import two files, inspect and compare relationships, approve the rules, then download a reusable `mapping.json` and an agent brief. Remote SQL/NoSQL connectors and pipeline execution remain future work.
 
 ## Try it
 
@@ -18,7 +18,7 @@ python -m pip install -e '.[dev]'
 atlasweave serve
 ```
 
-The command opens the local workspace. Choose your CSV/XLSX files, or click **Explore sample data**. The app uses the same engine as the CLI. No Node build, account, cloud upload, or model API is required. Stop the server with Ctrl+C to remove its temporary upload copies. See the [browser workspace guide](docs/getting-started/browser-workspace.md) for saving and reopening a project.
+The command opens the local workspace. Choose your CSV/XLSX files or standalone SQLite snapshots, or click **Explore sample data**. The app uses the same engine as the CLI. No Node build, account, cloud upload, or model API is required. Stop the server with Ctrl+C to remove its temporary upload copies. See the [browser workspace guide](docs/getting-started/browser-workspace.md) for saving and reopening a project.
 
 For the command-line workflow:
 
@@ -46,11 +46,11 @@ Use your own files in the ignored `local-data/` directory. XLSX parsing is cover
 
 ## Implemented
 
-- UTF-8 CSV and XLSX readers, sheet/header selection, and explicit delimiters.
+- UTF-8 CSV, XLSX, and read-only SQLite snapshot readers with explicit sheet/table selection.
 - Field-name search, profiles, aliases, type comparison, value overlap, and uniqueness ranking.
 - Full-scan versus sampled evidence, duplicate/null keys, unmatched rows, and join expansion counts.
 - Approval, rejection, reset, left/inner join rules, and optional trim/casefold normalization.
-- Responsive browser workspace with file selection/drop zones, sheet selection, search, candidate comparison, and manual pairs.
+- Responsive browser workspace with file selection/drop zones, sheet/table selection, search, candidate comparison, and manual pairs.
 - Browser project save/reopen and downloadable mapping JSON/agent briefs.
 - Versioned project/export schemas, source fingerprints, and revalidation before review/export.
 - Local processing with no external network calls, telemetry, model calls, or automatic agent execution. The browser talks only to the loopback server.

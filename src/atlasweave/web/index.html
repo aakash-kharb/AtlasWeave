@@ -129,7 +129,7 @@
                                 </h2>
                             </div>
                             <span class="section-hint"
-                                >CSV & Excel · Up to 32 MiB each</span
+                                >CSV, Excel & SQLite · Up to 32 MiB each</span
                             >
                         </div>
                         <div class="source-grid">
@@ -153,15 +153,21 @@
                                     ><input
                                         id="left-file"
                                         type="file"
-                                        accept=".csv,.xlsx"
+                                        accept=".csv,.xlsx,.sqlite,.sqlite3,.db"
                                 /></label>
+                                <p id="left-sqlite-note" class="notice" hidden>
+                                    Read-only snapshot · Choose an ordinary
+                                    table. Live/WAL databases are unsupported.
+                                </p>
                                 <div
                                     class="source-options"
                                     id="left-options"
                                     hidden
                                 >
                                     <label id="left-sheet-label" hidden
-                                        >Worksheet<select
+                                        ><span id="left-selection-name"
+                                            >Worksheet</span
+                                        ><select
                                             id="left-sheet"
                                             class="import-setting"
                                         ></select></label
@@ -211,15 +217,21 @@
                                     ><input
                                         id="right-file"
                                         type="file"
-                                        accept=".csv,.xlsx"
+                                        accept=".csv,.xlsx,.sqlite,.sqlite3,.db"
                                 /></label>
+                                <p id="right-sqlite-note" class="notice" hidden>
+                                    Read-only snapshot · Choose an ordinary
+                                    table. Live/WAL databases are unsupported.
+                                </p>
                                 <div
                                     class="source-options"
                                     id="right-options"
                                     hidden
                                 >
                                     <label id="right-sheet-label" hidden
-                                        >Worksheet<select
+                                        ><span id="right-selection-name"
+                                            >Worksheet</span
+                                        ><select
                                             id="right-sheet"
                                             class="import-setting"
                                         ></select></label
