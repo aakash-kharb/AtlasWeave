@@ -116,6 +116,13 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 100000
+        },
+        "table": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
         }
       },
       "required": [
@@ -424,7 +431,8 @@
         "format": {
           "enum": [
             "csv",
-            "xlsx"
+            "xlsx",
+            "sqlite"
           ]
         },
         "shape": {
@@ -464,7 +472,53 @@
         "path",
         "complete"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "sqlite"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "options": {
+                "required": [
+                  "table"
+                ],
+                "properties": {
+                  "table": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sheet": {
+                    "type": "null"
+                  },
+                  "header_row": {
+                    "const": 1
+                  },
+                  "delimiter": {
+                    "const": ","
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "options": {
+                "properties": {
+                  "table": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "export_source": {
       "type": "object",
@@ -484,7 +538,8 @@
         "format": {
           "enum": [
             "csv",
-            "xlsx"
+            "xlsx",
+            "sqlite"
           ]
         },
         "shape": {
@@ -523,7 +578,53 @@
         "warnings",
         "fields"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "sqlite"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "options": {
+                "required": [
+                  "table"
+                ],
+                "properties": {
+                  "table": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sheet": {
+                    "type": "null"
+                  },
+                  "header_row": {
+                    "const": 1
+                  },
+                  "delimiter": {
+                    "const": ","
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "options": {
+                "properties": {
+                  "table": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "approved": {
       "allOf": [

@@ -22,3 +22,5 @@ Tests cover CSV quoting/encoding, Excel sheets/number formats, malformed inputs,
 For a package change, install the built wheel in a fresh environment and run discovery/review/export from outside the repository. Also run `python /absolute/path/to/AtlasWeave/scripts/smoke_browser.py` with that environment's interpreter. This verifies packaged JSON schemas, browser assets/demo files, the HTTP workflow, and the console entry point, not just imports from `src/`.
 
 There are no benchmarks yet. Before raising workload limits, publish datasets, hardware, runtime/memory measurements, expected matches, and false-positive/false-negative metrics. Faster ranking alone does not establish mapping quality.
+
+SQLite coverage includes standalone snapshot checks, read-only authorization, quoted identifiers, views/virtual/generated/BLOB rejection, mixed CSV/SQLite joins, exact row-limit scans, table-bound exports, source freshness, and browser upload/reopen. Generate a local demo with `python scripts/create_sqlite_example.py`. Python must bundle SQLite 3.37+ with deserialize support for this adapter.

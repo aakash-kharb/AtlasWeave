@@ -47,7 +47,7 @@ def upload_name(name):
         or any(ord(char) < 32 or ord(char) == 127 for char in name)
         or name in (".", "..")
     ):
-        raise AtlasWeaveError("Choose a CSV/XLSX file with a plain filename.")
+        raise AtlasWeaveError("Choose a CSV/XLSX/SQLite file with a plain filename.")
     adapter_for(name)
     return name
 
@@ -91,6 +91,7 @@ class Workspace:
             path.write_bytes(content)
             adapter = adapter_for(name)
             sheets = adapter.discover(str(path)) if adapter.format == "xlsx" else []
+            tables = adapter.discover(str(path)) if adapter.format == "sqlite" else []
             destination = self.root / side
             shutil.rmtree(destination, ignore_errors=True)
             destination.mkdir()
@@ -100,6 +101,7 @@ class Workspace:
             "format": adapter.format,
             "bytes": len(content),
             "sheets": sheets,
+            "tables": tables,
         }
         self.project = None
         self.revision += 1

@@ -11,3 +11,5 @@ Put private input files under ignored `local-data/`, and projects/exports under 
 Spreadsheet text is untrusted. The app never evaluates formulas, runs SQL, calls URLs embedded in cells, or creates spreadsheet-compatible CSV exports. Formula-injection handling will be required if a future feature writes CSV intended for spreadsheet use.
 
 Agent briefs separate instructions from quoted JSON metadata, explicitly tell the recipient to ignore instruction-like cell/header content, and include only reviewed mappings. This is a boundary description, not a guarantee against prompt injection in an external model. Users choose whether to share the brief and must separately authorize any production changes.
+
+SQLite imports read a bounded standalone file into an in-memory database. The source is never opened by SQLite and is not modified. Browser uploads still use temporary copies, just like CSV/XLSX. Only table/column metadata and aggregate evidence reach saved projects and exports. WAL-mode files are rejected, since a single uploaded file cannot safely represent their external journal state.

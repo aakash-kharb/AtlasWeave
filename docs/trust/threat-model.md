@@ -2,7 +2,7 @@
 
 Assets: private source records, source locations, review intent, accurate join evidence, and an agent's downstream authority.
 
-Trust boundaries: imported CSV/XLSX → local parser; saved project → revalidation; mapping/brief → an external agent. A saved project is not a signed document and must not be accepted as proof of someone else's approval.
+Trust boundaries: imported CSV/XLSX/SQLite → local parser; saved project → revalidation; mapping/brief → an external agent. A saved project is not a signed document and must not be accepted as proof of someone else's approval.
 
 | Threat | Current control | Remaining limitation |
 | --- | --- | --- |
@@ -18,3 +18,5 @@ Trust boundaries: imported CSV/XLSX → local parser; saved project → revalida
 | Upload copies remaining on disk | Private temporary directory, explicit clear, graceful shutdown cleanup | A hard crash/kill may leave temporary files behind |
 
 Future remote connectors require credential isolation, network policy, read-only query behavior, cancellation, and adapter-specific validation before shipping. The current browser interface is a single-user local tool, not a production HTTP service.
+
+SQLite snapshots are untrusted binary input: accept bounded standalone files only, require SQLite 3.37+ with deserialize support, disable trusted schema and writes, allow only ordinary tables, reject generated/hidden columns and BLOB cells, and quote catalog-verified identifiers. An authorizer denies attachments, functions, and mutation; a VM instruction budget bounds database work. Source bytes never become user SQL. This is not a process sandbox; keep Python/SQLite patched. Views, virtual/shadow tables, live databases, and WAL mode are outside this release.

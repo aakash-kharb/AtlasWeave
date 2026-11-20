@@ -14,8 +14,11 @@ class ReadOptions:
     delimiter: str = ","
     header_row: int = 1
     max_rows: int = 10_000
+    table: str | None = None
 
     def __post_init__(self):
+        if self.table is not None and (not isinstance(self.table, str) or not self.table):
+            raise AtlasWeaveError("Table must be a nonempty name.")
         if len(self.delimiter) != 1 or self.delimiter in '\r\n"':
             raise AtlasWeaveError("Delimiter must be one character, excluding quote/newline.")
         if not 1 <= self.header_row <= 10_000:
